@@ -1,7 +1,6 @@
 // warning : This program may cause problems for large files.
 // see https://developer.mozilla.org/en-US/docs/Web/API/FileReader/readAsText
 
-import { PATTERN_TSV_INDEX } from "./modules/pattern-tsv-index.js";
 import { Replacement } from "./modules/replacement.js";
 
 const PATTERN_ID = "pattern";
@@ -15,7 +14,7 @@ document.getElementById(PATTERN_ID).addEventListener("change", main);
 async function main() {
   try {
     const pattern = await readFileAsText(getFile(PATTERN_ID));
-    const replacements = patternTextToReplacements(pattern);
+    const replacements = Replacement.readPatternTsv(pattern);
     console.log(replacements);
 
 
@@ -30,50 +29,7 @@ async function main() {
   }
 }
 
-/**
- * tsv format:
- * Pattern	Flags	Replacement
- * @param {string} tsv file content
- * @returns {Array<Replacement>}
- */
-function patternTextToReplacements(tsv) {
-  if (tsv == null) {
-    throw new Error("no pattern text");
-  }
 
-  const replacements = new Array();
-
-  // I would to read line by line, but I don't know it in Javascript
-  const lines = tsv.split(/\r?\n/);
-
-  // ignore the header
-  for(let i = 1; i < lines.length; ++i) {
-    // split one tab or spaces
-    const words = lines[i].split(/\t|\s+/);
-
-    
-    
-    try {
-      // format error
-      if (words.length < PATTERN_TSV_INDEX.Size) {
-        throw new Error(`pattern line requires: Pattern    Flags    Replacement`);
-      }
-
-      replacements.push(new Replacement(
-        words[PATTERN_TSV_INDEX.Pattern],
-        words[PATTERN_TSV_INDEX.Flags],
-        words[PATTERN_TSV_INDEX.Replacement]
-      ));
-    }
-    catch(cause) {
-      throw new Error(`Pattern TSV Format Error\n${cause.message}\n\n line ${i + 1}:\n${lines[i]}`,
-        {cause: cause}
-      );
-    }
-  }
-
-  return replacements;
-}
 
 /**
  * 
