@@ -50,12 +50,26 @@ function patternTextToReplacements(tsv) {
   for(let i = 1; i < lines.length; ++i) {
     // split one tab or spaces
     const words = lines[i].split(/\t|\s+/);
+
     
-    replacements.push(new Replacement(
-      words[PATTERN_TSV_INDEX.Pattern],
-      words[PATTERN_TSV_INDEX.Flags],
-      words[PATTERN_TSV_INDEX.Replacement]
-    ));
+    
+    try {
+      // format error
+      if (words.length < PATTERN_TSV_INDEX.Size) {
+        throw new Error(`pattern line requires: Pattern    Flags    Replacement`);
+      }
+
+      replacements.push(new Replacement(
+        words[PATTERN_TSV_INDEX.Pattern],
+        words[PATTERN_TSV_INDEX.Flags],
+        words[PATTERN_TSV_INDEX.Replacement]
+      ));
+    }
+    catch(cause) {
+      throw new Error(`Pattern TSV Format Error\n${cause.message}\n\n line ${i + 1}:\n${lines[i]}`,
+        {cause: cause}
+      );
+    }
   }
 
   return replacements;

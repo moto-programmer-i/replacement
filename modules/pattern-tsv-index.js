@@ -2,9 +2,10 @@
  * Format:
  * Pattern	Flags	Replacement
  */
-// enum
+// would to use enum
 export const PATTERN_TSV_INDEX =  {
     Pattern: 0,
     Flags: 1,
-    Replacement: 2
+    Replacement: 2,
+    Size: 3
 }
