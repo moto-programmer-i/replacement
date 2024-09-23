@@ -27,6 +27,15 @@ export class Replacement {
     }
 
     /**
+     * 
+     * @param {string} str 
+     * @returns new string
+     */
+    replace(str){
+      return str.replace(this.#regExp, this.#replacement);
+    }
+
+    /**
     * tsv format:
     * Pattern	Flags	Replacement
     * @param {string} tsv file content

@@ -1,0 +1,5 @@
+patternA
+patternA
+b
+patternA
+b

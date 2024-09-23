@@ -2,25 +2,28 @@
 // see https://developer.mozilla.org/en-US/docs/Web/API/FileReader/readAsText
 
 import { Replacement } from "./modules/replacement.js";
+import { FileUtils } from "./modules/file-utils.js";
 
 const PATTERN_ID = "pattern";
 const TARGET_ID = "target";
 const REPLACE_ID = "replace";
 
-document.getElementById(PATTERN_ID).addEventListener("change", main);
-// document.getElementById(REPLACE_ID).addEventListener("click", main);
+document.getElementById(REPLACE_ID).addEventListener("click", main);
 
 
 async function main() {
   try {
-    const pattern = await readFileAsText(getFile(PATTERN_ID));
+    const pattern = await FileUtils.readFileAsText(getFile(PATTERN_ID));
     const replacements = Replacement.readPatternTsv(pattern);
-    console.log(replacements);
-
-
-    return;
     
-    const target = await readFileAsText(getFile(TARGET_ID));
+    const targetFile = getFile(TARGET_ID);
+    let target = await FileUtils.readFileAsText(targetFile);
+
+    for(const replacement of replacements) {
+      target = replacement.replace(target);
+    }
+
+    FileUtils.saveFile(target, `replaced_${targetFile.name}`);
     
   }
   catch(error) {
@@ -40,22 +43,3 @@ function getFile(id) {
   return document.getElementById(id).files[0];
 }
 
-/**
- * ファイル読み込み
- * @param {File} file error if null
- * @returns {string} the content text
- */
-async function readFileAsText(file) {
-  if(file == null) {
-    throw new Error("File not found");
-  }
-
-  // sync file read
-  // https://stackoverflow.com/a/46568146
-  return await new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = reject;
-    reader.readAsText(file);
-  });
-}
